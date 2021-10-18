@@ -1,6 +1,9 @@
 # Dependencies
 
-This project requires glfw3 to be available somewhere in your system's C include directories, I think it is dynamically linked to.
+- glfw3
+- glad
+
+This project requires glfw3 to be available somewhere in your system's C include directories, I think it is dynamically linked to. Also, you need a glad.h header in your include directories specifically for opengl 3.3. You can download them from `glad.dav1d.de`. When doing so, set "profile" to "core".
 
 # About <GLFW/glfw3.h>
 

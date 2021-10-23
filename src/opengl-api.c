@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 CreateShaderFunc * glCreateShader;
+ShaderSourceFunc * glShaderSource;
 
 int openglApiInit()
 {
@@ -18,6 +19,13 @@ int openglApiInit()
 	if (!glCreateShader)
 	{
 		printf("Function glCreateShader couldn't be loaded from libGL.so\n");
+		return 0;
+	}
+
+	glShaderSource = (ShaderSourceFunc * ) dlsym(libGL, "glShaderSource");
+	if (!glShaderSource)
+	{
+		printf("Function glShaderSource couldn't be loaded from libGL.so\n");
 		return 0;
 	}
 

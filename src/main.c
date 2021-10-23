@@ -56,7 +56,7 @@ int main()
 	/* Compile our vertex shader */
 	unsigned int vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	/* glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); */
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	/* glCompileShader(vertexShader); */
 	/* Check if vertex shader compiled correctly */
 	/* { */
@@ -73,7 +73,7 @@ int main()
 	/* Compile our fragment shader. */
 	unsigned int fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	/* glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL); */
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	/* glCompileShader(fragmentShader); */
 	/* Check if fragment shader compiled correctly */
 	/* { */

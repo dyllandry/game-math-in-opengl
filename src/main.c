@@ -1,4 +1,3 @@
-/* #include <glad/glad.h> */
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include "opengl-api.h"
@@ -41,14 +40,8 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	/* glad: load opengl function pointers */
+	/* opengl: init function pointers to gpu driver's opengl api. */
 	/* -------------------------------------------------------------------- */
-	/* if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) */
-	/* { */
-	/* 	printf("Failed to initialize GLAD\n"); */
-	/* 	return 1; */
-	/* } */
-
 	openglApiInit();
 
 	/* Build and compile shader program */

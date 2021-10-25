@@ -102,31 +102,23 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	/* Setup vertex data, buffers, and configure vertex attributes. */
+	/* Setup vertex data, buffers, and configure vertex attributes for left triangle. */
 	/* -------------------------------------------------------------------- */
-	float vertices[] =
+	float leftTriVertices[] =
 	{
-		0.5f,  0.5f, 0.0f,   // top right
-		0.5f, -0.5f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left
-	};
-	unsigned int indices[] =
-	{
-		0, 1, 3,  // first triangle
-		1, 2, 3   // second triangle
+		-0.6f,  0.5f, 0.0f,   // top left
+		0.4f,  0.5f, 0.0f,   // top right
+		-0.6f, -0.5f, 0.0f,  // bottom left
 	};
 	/* Setup vertex buffer object, vertex array object */
-	unsigned int VBO, VAO, EBO;
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
+	unsigned int leftTriVBO, leftTriVAO;
+	glGenBuffers(1, &leftTriVBO);
+	/* glGenBuffers(1, &lTriEBO); */
+	glGenVertexArrays(1, &leftTriVAO);
 	/* Bind VAO first, then VBO, then setup vertex attributes. */
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBindVertexArray(leftTriVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, leftTriVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(leftTriVertices), leftTriVertices, GL_STATIC_DRAW);
 	/* Link vertex attributes */
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -135,8 +127,35 @@ int main()
 	/* Unbind VAO. */
 	glBindVertexArray(0);
 
+	/* Setup vertex data, buffers, and configure vertex attributes for right triangle. */
+	/* -------------------------------------------------------------------- */
+	float rightTriVertices[] =
+	{
+		0.6f,  0.5f, 0.0f,   // top right
+		0.6f, -0.5f, 0.0f,   // bottom right
+		-0.4f, -0.5f, 0.0f,  // bottom left
+	};
+	unsigned int rightTriVBO;
+	unsigned int rightTriVAO;
+	/* Get ids for vbo and vao */
+	glGenBuffers(1, &rightTriVBO);
+	glGenVertexArrays(1, &rightTriVAO);
+	/* Bind them for manipulation, vao first, vbo second */
+	glBindVertexArray(rightTriVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, rightTriVBO);
+	/* Fill VBO with data */
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rightTriVertices), rightTriVertices, GL_STATIC_DRAW);
+	/* Tell opengl it should give first 3 floats of vertex data to shader as a vertex attribute. */
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
+	/* Enable vertex attributes for shader. */
+	glEnableVertexAttribArray(0);
+
+	/* unbind vbo first, vao second */
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
 	/* uncomment this call to draw in wireframe polygons. */
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	/* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
 
 	/* Render loop */
 	/* -------------------------------------------------------------------- */
@@ -150,11 +169,13 @@ int main()
 
 		/* Draw triangle */
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
+
+		glBindVertexArray(leftTriVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		/* Don't have to unbind since we don't draw anything else, but */
-		/* you would if you had other shapes to draw. */
+		glBindVertexArray(0);
+
+		glBindVertexArray(rightTriVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
 
 		/* glfw: swap the double render buffer & poll IO events */
@@ -163,8 +184,8 @@ int main()
 	}
 
 	/* De-allocate resources */
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &leftTriVAO);
+	glDeleteBuffers(1, &leftTriVBO);
 	glDeleteProgram(shaderProgram);
 
 	/* glfw: terminate, clears all allocated GLFW resources */

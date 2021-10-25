@@ -4,11 +4,13 @@
 
 /* Here we define pointers to each of the opengl functions we use by defining a
  * function-like macro "GL_FUNC" and applying it to each "GL_FUNC" macro
- * contained by "GL_FUNC_LIST". */
+ * contained by "GL_FUNC_LIST". This xmacro is defined in our header. */
 #define GL_FUNC(returnType, funcName, ...) funcName##Type * funcName;
 GL_FUNC_LIST
 #undef GL_FUNC
 
+/* Call this function once from whatever function initializes your opengl
+ * functions. */
 int openglApiInit()
 {
 	void * libGL = dlopen("libGL.so", RTLD_LAZY);
@@ -32,3 +34,4 @@ int openglApiInit()
 
 	return 1;
 }
+

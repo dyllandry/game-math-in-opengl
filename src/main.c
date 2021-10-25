@@ -1,6 +1,6 @@
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include "opengl-api.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -40,13 +40,9 @@ int main()
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	/* glad: load opengl function pointers */
+	/* opengl: init function pointers to gpu driver's opengl api. */
 	/* -------------------------------------------------------------------- */
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		printf("Failed to initialize GLAD\n");
-		return 1;
-	}
+	openglApiInit();
 
 	/* Build and compile shader program */
 	/* -------------------------------------------------------------------- */
@@ -90,6 +86,7 @@ int main()
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
+
 	/* Check if shader program linked successfuly */
 	{
 		int success;
@@ -120,8 +117,7 @@ int main()
 		1, 2, 3   // second triangle
 	};
 	/* Setup vertex buffer object, vertex array object */
-	unsigned int VBO, VAO;
-	unsigned int EBO;
+	unsigned int VBO, VAO, EBO;
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
@@ -155,7 +151,7 @@ int main()
 		/* Draw triangle */
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		/* glDrawArrays(GL_TRIANGLES, 0, 3); */
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		/* Don't have to unbind since we don't draw anything else, but */
 		/* you would if you had other shapes to draw. */

@@ -16,7 +16,7 @@ DEPENDS := $(patsubst %.c,%.d,$(SOURCES))
 
 # Rule for compiling main executable
 main: $(OBJECTS)
-	$(CC) $^ -o bin/$@ -lglfw -lGL -ldl -fPIE 
+	$(CC) $^ -o bin/$@ -lglfw -lGL -ldl -lm -fPIE
 
 # Includes other make files in this make file (- means if it exists)
 -include $(DEPENDS)

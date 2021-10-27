@@ -1,5 +1,6 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include <math.h>
 #include "opengl-api.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -9,21 +10,16 @@ const char *vertexShaderSource = "#version 330 core \n"
 	"layout (location = 0) in vec3 aPos;\n"
 	"void main()\n"
 	"{\n"
-	"        gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+	"        gl_Position = vec4(aPos, 1.0);\n"
 	"}\0";
 
-const char *orangeFragmentShaderSource = "#version 330 core\n"
+const char *fragmentShaderSource = "#version 330 core\n"
 	"out vec4 FragColor;\n"
+	"in vec4 vertexColor;\n"
+	"uniform vec4 ourColor;\n"
 	"void main()\n"
 	"{\n"
-	"        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-	"}\n";
-
-const char *yellowFragmentShaderSource = "#version 330 core\n"
-	"out vec4 FragColor;\n"
-	"void main()\n"
-	"{\n"
-	"        FragColor = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
+	"        FragColor = vec4(ourColor);\n"
 	"}\n";
 
 int main()
@@ -70,131 +66,68 @@ int main()
 			return 1;
 		}
 	}
-	/* Compile our orange fragment shader. */
-	unsigned int orangeFragmentShader;
-	orangeFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(orangeFragmentShader, 1, &orangeFragmentShaderSource, NULL);
-	glCompileShader(orangeFragmentShader);
-	/* Check if orange fragment shader compiled correctly */
+	/* Compile our fragment shader. */
+	unsigned int fragmentShader;
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glCompileShader(fragmentShader);
+	/* Check if fragment shader compiled correctly */
 	{
 		int success;
 		char infoLog[512];
-		glGetShaderiv(orangeFragmentShader, GL_COMPILE_STATUS, &success);
+		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
 		if (!success)
 		{
-			glGetShaderInfoLog(orangeFragmentShader, 512, NULL, infoLog);
+			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 			printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
 			return 1;
 		}
 	}
-	/* Compile our yellow fragment shader. */
-	unsigned int yellowFragmentShader;
-	yellowFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(yellowFragmentShader, 1, &yellowFragmentShaderSource, NULL);
-	glCompileShader(yellowFragmentShader);
-	/* Check if yellow fragment shader compiled correctly */
-	{
-		int success;
-		char infoLog[512];
-		glGetShaderiv(yellowFragmentShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(yellowFragmentShader, 512, NULL, infoLog);
-			printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
-			return 1;
-		}
-	}
-	/* Links shaders into orange shader program. */
-	unsigned int orangeShaderProgram;
-	orangeShaderProgram = glCreateProgram();
-	glAttachShader(orangeShaderProgram, vertexShader);
-	glAttachShader(orangeShaderProgram, orangeFragmentShader);
-	glLinkProgram(orangeShaderProgram);
+	/* Links shaders into shader program. */
+	unsigned int shaderProgram;
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
 	/* Check if shader program linked successfuly */
 	{
 		int success;
 		char infoLog[512];
-		glGetProgramiv(orangeShaderProgram, GL_LINK_STATUS, &success);
+		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 		if (!success)
 		{
-			glGetProgramInfoLog(orangeShaderProgram, 512, NULL, infoLog);
-			printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
-			return 1;
-		}
-	}
-	/* Link shaders into yellow shader program */
-	unsigned int yellowShaderProgram;
-	yellowShaderProgram = glCreateProgram();
-	glAttachShader(yellowShaderProgram, vertexShader);
-	glAttachShader(yellowShaderProgram, yellowFragmentShader);
-	glLinkProgram(yellowShaderProgram);
-	/* Check if shader program linked successfuly */
-	{
-		int success;
-		char infoLog[512];
-		glGetProgramiv(yellowShaderProgram, GL_LINK_STATUS, &success);
-		if (!success)
-		{
-			glGetProgramInfoLog(yellowShaderProgram, 512, NULL, infoLog);
+			glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
 			printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
 			return 1;
 		}
 	}
 
 	glDeleteShader(vertexShader);
-	glDeleteShader(orangeFragmentShader);
-	glDeleteShader(yellowFragmentShader);
+	glDeleteShader(fragmentShader);
 
-	/* Setup vertex data, buffers, and configure vertex attributes for left triangle. */
+	/* Setup vertex data, buffers, and configure vertex attributes for triangle. */
 	/* -------------------------------------------------------------------- */
-	float leftTriVertices[] =
+	float triVertices[] =
 	{
-		-0.6f,  0.5f, 0.0f,   // top left
-		0.4f,  0.5f, 0.0f,   // top right
-		-0.6f, -0.5f, 0.0f,  // bottom left
+		0.0f,  0.5f, 0.0f,  // top center
+		0.5f,  -0.5f, 0.0f,   // bottom right
+		-0.5f, -0.5f, 0.0f,  // bottom left
 	};
 	/* Setup vertex buffer object, vertex array object */
-	unsigned int leftTriVBO, leftTriVAO;
-	glGenBuffers(1, &leftTriVBO);
+	unsigned int triVBO, triVAO;
+	glGenBuffers(1, &triVBO);
 	/* glGenBuffers(1, &lTriEBO); */
-	glGenVertexArrays(1, &leftTriVAO);
+	glGenVertexArrays(1, &triVAO);
 	/* Bind VAO first, then VBO, then setup vertex attributes. */
-	glBindVertexArray(leftTriVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, leftTriVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(leftTriVertices), leftTriVertices, GL_STATIC_DRAW);
+	glBindVertexArray(triVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, triVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW);
 	/* Link vertex attributes */
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	/* Unbind VBO. */
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	/* Unbind VAO. */
-	glBindVertexArray(0);
-
-	/* Setup vertex data, buffers, and configure vertex attributes for right triangle. */
-	/* -------------------------------------------------------------------- */
-	float rightTriVertices[] =
-	{
-		0.6f,  0.5f, 0.0f,   // top right
-		0.6f, -0.5f, 0.0f,   // bottom right
-		-0.4f, -0.5f, 0.0f,  // bottom left
-	};
-	unsigned int rightTriVBO;
-	unsigned int rightTriVAO;
-	/* Get ids for vbo and vao */
-	glGenBuffers(1, &rightTriVBO);
-	glGenVertexArrays(1, &rightTriVAO);
-	/* Bind them for manipulation, vao first, vbo second */
-	glBindVertexArray(rightTriVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, rightTriVBO);
-	/* Fill VBO with data */
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rightTriVertices), rightTriVertices, GL_STATIC_DRAW);
-	/* Tell opengl it should give first 3 floats of vertex data to shader as a vertex attribute. */
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
-	/* Enable vertex attributes for shader. */
-	glEnableVertexAttribArray(0);
-
-	/* unbind vbo first, vao second */
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 	/* uncomment this call to draw in wireframe polygons. */
@@ -210,15 +143,18 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		/* Draw left orange triangle */
-		glUseProgram(orangeShaderProgram);
-		glBindVertexArray(leftTriVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
 
-		/* Draw right yellow triangle */
-		glUseProgram(yellowShaderProgram);
-		glBindVertexArray(rightTriVAO);
+		/* Activate shader */
+		glUseProgram(shaderProgram);
+
+		/* Change triangle color. */
+		float timeValue = glfwGetTime();
+		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+		/* Draw triangle */
+		glBindVertexArray(triVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(0);
 
@@ -228,10 +164,9 @@ int main()
 	}
 
 	/* De-allocate resources */
-	glDeleteVertexArrays(1, &leftTriVAO);
-	glDeleteBuffers(1, &leftTriVBO);
-	glDeleteProgram(orangeShaderProgram);
-	glDeleteProgram(yellowShaderProgram);
+	glDeleteVertexArrays(1, &triVAO);
+	glDeleteBuffers(1, &triVBO);
+	glDeleteProgram(shaderProgram);
 
 	/* glfw: terminate, clears all allocated GLFW resources */
 	glfwTerminate();

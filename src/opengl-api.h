@@ -50,7 +50,9 @@
 	GL_FUNC(void, glUseProgram, GLuint program) \
 	GL_FUNC(void, glDeleteVertexArrays, GLsizei n, const GLuint *arrays) \
 	GL_FUNC(void, glDeleteBuffers, GLsizei n, const GLuint * buffers) \
-	GL_FUNC(void, glDeleteProgram, GLuint program)
+	GL_FUNC(void, glDeleteProgram, GLuint program) \
+	GL_FUNC(GLint, glGetUniformLocation, GLuint program, const GLchar *name) \
+	GL_FUNC(void, glUniform4f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 
 #define GL_FUNC(returnType, funcName, ...) \
 	/* Create a typedef for the opengl function so the function pointers are shorter to type. */ \

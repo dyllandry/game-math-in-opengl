@@ -8,18 +8,20 @@ void processInput(GLFWwindow *window);
 
 const char *vertexShaderSource = "#version 330 core \n"
 	"layout (location = 0) in vec3 aPos;\n"
+	"layout (location = 1) in vec3 aColor;\n"
+	"out vec3 ourColor;\n"
 	"void main()\n"
 	"{\n"
 	"        gl_Position = vec4(aPos, 1.0);\n"
+	"        ourColor = aColor;\n"
 	"}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
 	"out vec4 FragColor;\n"
-	"in vec4 vertexColor;\n"
-	"uniform vec4 ourColor;\n"
+	"in vec3 ourColor;\n"
 	"void main()\n"
 	"{\n"
-	"        FragColor = vec4(ourColor);\n"
+	"        FragColor = vec4(ourColor, 1.0f);\n"
 	"}\n";
 
 int main()
@@ -109,9 +111,10 @@ int main()
 	/* -------------------------------------------------------------------- */
 	float triVertices[] =
 	{
-		0.0f,  0.5f, 0.0f,  // top center
-		0.5f,  -0.5f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
+		// Positions         // Colors
+		0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,
+		0.5f,  -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
 	};
 	/* Setup vertex buffer object, vertex array object */
 	unsigned int triVBO, triVAO;
@@ -123,8 +126,12 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, triVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW);
 	/* Link vertex attributes */
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	/* Position attribute */
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	/* Color attribute */
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)( 3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 	/* Unbind VBO. */
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	/* Unbind VAO. */

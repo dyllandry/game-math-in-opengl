@@ -14,7 +14,8 @@ char * getFileBytes(const char *filePath)
 	fseek(file, 0, SEEK_END);
 	long fileSize = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	char *fileText = malloc(fileSize + 1);
+	// Use calloc to zero memory, thus null terminating every character ahead of time.
+	char *fileText = calloc(fileSize + 1, 1);
 	if (!fileText)
 	{
 		printf("ERROR::FILE_HELPERS::GET_FILE_TEXT::ALLOCATE_BUFFER_FOR_FILE_FAILED PATH=%s\n", filePath);

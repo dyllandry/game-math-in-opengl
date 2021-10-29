@@ -39,6 +39,8 @@
 	GL_FUNC(void, glLinkProgram, GLuint program) \
 	GL_FUNC(void, glGetProgramiv, GLuint program, GLenum pname, GLint *params) \
 	GL_FUNC(void, glGetProgramInfoLog, GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog) \
+	GL_FUNC(void, glUseProgram, GLuint program) \
+	GL_FUNC(void, glDeleteProgram, GLuint program) \
 	GL_FUNC(void, glDeleteShader, GLuint shader) \
 	GL_FUNC(void, glGenBuffers, GLsizei n, GLuint * buffers) \
 	GL_FUNC(void, glGenVertexArrays, GLsizei n, GLuint *arrays) \
@@ -47,12 +49,13 @@
 	GL_FUNC(void, glBufferData, GLenum target, GLsizeiptr size, const void *data, GLenum usage) \
 	GL_FUNC(void, glVertexAttribPointer, GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) \
 	GL_FUNC(void, glEnableVertexAttribArray, GLuint index) \
-	GL_FUNC(void, glUseProgram, GLuint program) \
 	GL_FUNC(void, glDeleteVertexArrays, GLsizei n, const GLuint *arrays) \
 	GL_FUNC(void, glDeleteBuffers, GLsizei n, const GLuint * buffers) \
-	GL_FUNC(void, glDeleteProgram, GLuint program) \
 	GL_FUNC(GLint, glGetUniformLocation, GLuint program, const GLchar *name) \
-	GL_FUNC(void, glUniform4f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+	GL_FUNC(void, glUniform4f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) \
+	GL_FUNC(void, glUniform1i, GLint location, GLint v0) \
+	GL_FUNC(void, glUniform1f, GLint location, GLfloat v0) \
+	GL_FUNC(void, glUniform3f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
 
 #define GL_FUNC(returnType, funcName, ...) \
 	/* Create a typedef for the opengl function so the function pointers are shorter to type. */ \

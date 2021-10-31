@@ -55,7 +55,8 @@
 	GL_FUNC(void, glUniform4f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) \
 	GL_FUNC(void, glUniform1i, GLint location, GLint v0) \
 	GL_FUNC(void, glUniform1f, GLint location, GLfloat v0) \
-	GL_FUNC(void, glUniform3f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+	GL_FUNC(void, glUniform3f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2) \
+	GL_FUNC(void, glGenerateMipmap, GLenum target)
 
 #define GL_FUNC(returnType, funcName, ...) \
 	/* Create a typedef for the opengl function so the function pointers are shorter to type. */ \

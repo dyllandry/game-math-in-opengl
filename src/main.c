@@ -87,8 +87,8 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	/* Load and generate the texture */
-	int textureWidth, textureHeight, textureNumChannels;
 	stbi_set_flip_vertically_on_load(1);
+	int textureWidth, textureHeight, textureNumChannels;
 	unsigned char *textureData = stbi_load("media/container.jpg", &textureWidth, &textureHeight, &textureNumChannels, 0);
 	if (!textureData)
 	{
@@ -98,6 +98,33 @@ int main()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(textureData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	/* load and create a second texture*/
+	/* -------------------------------------------------------------------- */
+	unsigned int faceTexture;
+	glGenTextures(1, &faceTexture);
+	glBindTexture(GL_TEXTURE_2D, faceTexture);
+	/* Set texture wrapping/filtering options */
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	/* Load and generate the texture */
+	int faceTextureWidth, faceTextureHeight, faceTextureNumChannels;
+	unsigned char *faceTextureData = stbi_load("media/awesomeface.png", &faceTextureWidth, &faceTextureHeight, &faceTextureNumChannels, 0);
+	if (!faceTextureData)
+	{
+		printf("TEXTURE::LOAD_FACE_TEXTURE_DATA_FAILED\n");
+		exit(EXIT_FAILURE);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, faceTextureWidth, faceTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, faceTextureData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(faceTextureData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	/* Necessary for transparency in textures. */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* uncomment this call to draw in wireframe polygons. */
 	/* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
@@ -116,14 +143,17 @@ int main()
 		/* Draw */
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, faceTexture);
 
 		/* Use shader */
 		useShader(defaultShader);
+		setShaderInt(defaultShader, "texture1", 0);
+		setShaderInt(defaultShader, "texture2", 1);
+
+		/* Use VAO to remember location of vertex attributes. */
 		glBindVertexArray(vao);
-		setShaderInt(defaultShader, "ourTexture", 0);
-
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 		glBindVertexArray(0);
 
 		/* glfw: swap the double render buffer & poll IO events */

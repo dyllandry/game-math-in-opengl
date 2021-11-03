@@ -6,7 +6,13 @@
 #include "../ext/include/stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void keyPressed(GLFWwindow* window, int key, int scancode, int action, int mods);
+void changeTextureMix(float delta);
+void increaseTextureMix();
+void decreaseTextureMix();
+
+struct Shader defaultShader;
+float textureMix = 0.2f;
 
 int main()
 {
@@ -35,7 +41,7 @@ int main()
 
 	/* Create our shader */
 	/* -------------------------------------------------------------------- */
-	struct Shader defaultShader = NewShader("src/vertex-shader.glsl", "src/fragment-shader.glsl");
+	defaultShader = NewShader("src/vertex-shader.glsl", "src/fragment-shader.glsl");
 
 	/* Setup vertex data, buffers, and configure vertex attributes. */
 	/* -------------------------------------------------------------------- */
@@ -129,12 +135,13 @@ int main()
 	/* uncomment this call to draw in wireframe polygons. */
 	/* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
 
+	/* handle Input */
+	glfwSetKeyCallback(window, &keyPressed);
+
 	/* Render loop */
 	/* -------------------------------------------------------------------- */
 	while (!glfwWindowShouldClose(window))
 	{
-		/* handle user input */
-		processInput(window);
 		/* render */
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -150,6 +157,7 @@ int main()
 		useShader(defaultShader);
 		setShaderInt(defaultShader, "texture1", 0);
 		setShaderInt(defaultShader, "texture2", 1);
+		setShaderFloat(defaultShader, "smileyOpacity", 0.8f);
 
 		/* Use VAO to remember location of vertex attributes. */
 		glBindVertexArray(vao);
@@ -176,8 +184,30 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window)
+void keyPressed(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, 1);
+	if (action != GLFW_PRESS) return;
+
+	if (key == GLFW_KEY_UP) increaseTextureMix();
+	else if (key == GLFW_KEY_DOWN) decreaseTextureMix();
+	else if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, 1);
 }
+
+void increaseTextureMix()
+{
+	changeTextureMix(0.2f);
+}
+
+void decreaseTextureMix()
+{
+	changeTextureMix(-0.2f);
+}
+
+void changeTextureMix(float delta)
+{
+	textureMix += delta;
+	if (textureMix > 1.0f) textureMix = 1;
+	else if (textureMix < 0.0f) textureMix = 0.0f;
+	setShaderFloat(defaultShader, "textureMix", textureMix);
+}
+

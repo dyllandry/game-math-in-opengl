@@ -4,15 +4,34 @@
 #include "opengl-api.h"
 #include "shader.h"
 #include "../ext/include/stb_image.h"
+#include "../ext/include/cglm/vec4.h"
+#include "../ext/include/cglm/mat4.h"
+#include "../ext/include/cglm/affine.h"
+
+#define DEBUG
+
+#include "../ext/include/cglm/io.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void keyPressed(GLFWwindow* window, int key, int scancode, int action, int mods);
 void changeTextureMix(float delta);
 void increaseTextureMix();
 void decreaseTextureMix();
+void moveLeft();
+void moveRight();
+void moveUp();
+void moveDown();
+void scaleUp();
+void scaleDown();
+void rotateClockwise();
+void rotateCounterClockwise();
 
 struct Shader defaultShader;
 float textureMix = 0.2f;
+
+vec4 position = { 0.0f, 0.0f, 0.0f, 1.0f };
+vec3 scale = { 1.0f, 1.0f, 1.0f }; 
+float rotationRadians = 0.0f;
 
 int main()
 {
@@ -147,17 +166,30 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 
-		/* Draw */
+		/* Bind textures */
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, faceTexture);
+
+		/* Compute transform matrix */
+		mat4 transform;
+		glm_mat4_identity(transform);
+		// translate
+		glm_translate(transform, position);
+		// rotate
+		glm_rotate(transform, rotationRadians, GLM_ZUP);
+		glm_vec4_print(position, stdout);
+		// scale
+		glm_scale(transform, scale);
+		glm_mat4_print(transform, stdout);
 
 		/* Use shader */
 		useShader(defaultShader);
 		setShaderInt(defaultShader, "texture1", 0);
 		setShaderInt(defaultShader, "texture2", 1);
 		setShaderFloat(defaultShader, "smileyOpacity", 0.8f);
+		setShaderMat4(defaultShader, "transform", transform);
 
 		/* Use VAO to remember location of vertex attributes. */
 		glBindVertexArray(vao);
@@ -191,6 +223,56 @@ void keyPressed(GLFWwindow* window, int key, int scancode, int action, int mods)
 	if (key == GLFW_KEY_UP) increaseTextureMix();
 	else if (key == GLFW_KEY_DOWN) decreaseTextureMix();
 	else if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, 1);
+	else if (key == GLFW_KEY_A) moveLeft();
+	else if (key == GLFW_KEY_D) moveRight();
+	else if (key == GLFW_KEY_W) moveUp();
+	else if (key == GLFW_KEY_S) moveDown();
+	else if (key == GLFW_KEY_Q) rotateCounterClockwise();
+	else if (key == GLFW_KEY_E) rotateClockwise();
+	else if (key == GLFW_KEY_R) scaleUp();
+	else if (key == GLFW_KEY_F) scaleDown();
+}
+
+void moveLeft()
+{
+	position[0] -= 0.1f;
+}
+
+void moveRight()
+{
+	position[0] += 0.1f;
+}
+
+void moveUp()
+{
+	position[1] += 0.1f;
+}
+
+void moveDown()
+{
+	position[1] -= 0.1f;
+}
+
+void scaleUp()
+{
+	scale[0] += 0.1f;
+	scale[1] += 0.1f;
+}
+
+void scaleDown()
+{
+	scale[0] -= 0.1f;
+	scale[1] -= 0.1f;
+}
+
+void rotateClockwise()
+{
+	rotationRadians -= (2.0f * GLM_PI) / 18.0f;
+}
+
+void rotateCounterClockwise()
+{
+	rotationRadians += (2.0f * GLM_PI) / 18.0f;
 }
 
 void increaseTextureMix()

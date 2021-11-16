@@ -56,6 +56,7 @@
 	GL_FUNC(void, glUniform1i, GLint location, GLint v0) \
 	GL_FUNC(void, glUniform1f, GLint location, GLfloat v0) \
 	GL_FUNC(void, glUniform3f, GLint location, GLfloat v0, GLfloat v1, GLfloat v2) \
+	GL_FUNC(void, glUniformMatrix4fv, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) \
 	GL_FUNC(void, glGenerateMipmap, GLenum target)
 
 #define GL_FUNC(returnType, funcName, ...) \

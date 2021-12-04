@@ -70,47 +70,60 @@ int main()
 	/* Setup vertex data, buffers, and configure vertex attributes. */
 	/* -------------------------------------------------------------------- */
 	float vertices[] = {
-	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-	    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
+	vec3 cubePositions[] = {
+		{0.0f,  0.0f, 0.0f },
+		{2.0f, 5.0f, -15.0f },
+		{-1.5f, -2.2f, -2.5f },
+		{-3.8f, -2.0f, -12.3f },
+		{2.4f, -0.4f, -3.5f },
+		{-1.7f, 3.0f, -7.5f },
+		{1.3f, -2.0f, -2.5f },
+		{1.5f, 2.0f, -2.5f },
+		{1.5f, 0.2f, -1.5f },
+		{-1.3f, 1.0f, -1.5f }
 	};
 
 	glEnable(GL_DEPTH_TEST);
@@ -203,46 +216,42 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, faceTexture);
 
-		/* Compute transform matrix */
-		mat4 transform;
-		glm_mat4_identity(transform);
-		// translate
-		glm_translate(transform, position);
-		// rotate
-		glm_rotate(transform, rotationRadians, GLM_ZUP);
-		// scale
-		glm_scale(transform, scale);
+		for (int i = 0; i < sizeof(cubePositions)/sizeof(cubePositions[0]); i++)
+		{
+			/* Create model, view, and projection matrixes so*/
+			/* opengl can transform our local vectors to clip*/
+			/* space.*/
+			// Model matrix
+			mat4 modelMatrix;
+			glm_translate_make(modelMatrix, cubePositions[i]);
+			glm_rotate(modelMatrix, glm_rad(-10.0f * glfwGetTime()), GLM_YUP);
+			glm_rotate(modelMatrix, glm_rad(10.0f * glfwGetTime()), GLM_XUP);
+			// View matrix
+			mat4 viewMatrix;
+			glm_mat4_identity(viewMatrix);
+			glm_translate_z(viewMatrix, -3.0f);
+			// Projection matrix
+			mat4 perspectiveMatrix;
+			glm_mat4_identity(perspectiveMatrix);
+			glm_perspective(glm_rad(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f, perspectiveMatrix);
 
-		/* Create model, view, and projection matrixes so opengl can
-		 * transform our local vectors to clip space. */
-		// Model matrix
-		mat4 modelMatrix;
-		glm_rotate_make(modelMatrix, glm_rad(-55.0f), GLM_XUP);
-		glm_rotate_at(modelMatrix, GLM_VEC3_ZERO, glm_rad(-55.0f) * glfwGetTime(), GLM_ZUP);
-		// View matrix
-		mat4 viewMatrix;
-		glm_mat4_identity(viewMatrix);
-		glm_translate_z(viewMatrix, -3.0f);
-		// Projection matrix
-		mat4 perspectiveMatrix;
-		glm_mat4_identity(perspectiveMatrix);
-		glm_perspective(glm_rad(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f, perspectiveMatrix);
+			/* Use shader */
+			useShader(defaultShader);
+			/* Set textures */
+			setShaderInt(defaultShader, "texture1", 0);
+			setShaderInt(defaultShader, "texture2", 1);
+			setShaderFloat(defaultShader, "smileyOpacity", 0.8f);
+			/* Pass uniforms */
+			setShaderMat4(defaultShader, "modelMatrix", modelMatrix);
+			setShaderMat4(defaultShader, "viewMatrix", viewMatrix);
+			setShaderMat4(defaultShader, "perspectiveMatrix", perspectiveMatrix);
 
-		/* Use shader */
-		useShader(defaultShader);
-		setShaderInt(defaultShader, "texture1", 0);
-		setShaderInt(defaultShader, "texture2", 1);
-		setShaderFloat(defaultShader, "smileyOpacity", 0.8f);
-		setShaderMat4(defaultShader, "transform", transform);
-		setShaderMat4(defaultShader, "modelMatrix", modelMatrix);
-		setShaderMat4(defaultShader, "viewMatrix", viewMatrix);
-		setShaderMat4(defaultShader, "perspectiveMatrix", perspectiveMatrix);
-
-		/* Use VAO to remember location of vertex attributes. */
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+			/* Use VAO to remember location of vertex attributes. */
+			glBindVertexArray(vao);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+		}
 
 		/* glfw: swap the double render buffer & poll IO events */
 		glfwSwapBuffers(window);

@@ -7,6 +7,7 @@
 #include "../ext/include/cglm/vec4.h"
 #include "../ext/include/cglm/mat4.h"
 #include "../ext/include/cglm/affine.h"
+#include "../ext/include/cglm/cam.h"
 
 #define DEBUG
 
@@ -30,8 +31,11 @@ struct Shader defaultShader;
 float textureMix = 0.2f;
 
 vec4 position = { 0.0f, 0.0f, 0.0f, 1.0f };
-vec3 scale = { 1.0f, 1.0f, 1.0f }; 
+vec3 scale = { 1.0f, 1.0f, 1.0f };
 float rotationRadians = 0.0f;
+
+int screenWidth;
+int screenHeight;
 
 int main()
 {
@@ -53,6 +57,7 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
 
 	/* opengl: init function pointers to gpu driver's opengl api. */
 	/* -------------------------------------------------------------------- */
@@ -64,42 +69,69 @@ int main()
 
 	/* Setup vertex data, buffers, and configure vertex attributes. */
 	/* -------------------------------------------------------------------- */
-	float vertices[] =
-	{
-		// positions          // colors           // texture coords
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 				     
+	float vertices[] = {
+	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
-	unsigned int indices[] =
-	{
-		0, 1, 3,  // first triangle
-		1, 2, 3   // second triangle
-	};
+
+	glEnable(GL_DEPTH_TEST);
+
 	/* Setup vertex buffer object, vertex array object */
-	unsigned int vbo, vao, ebo;
+	unsigned int vbo, vao;
 	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
 	glGenVertexArrays(1, &vao);
 	/* Bind VAO first, then VBO, then setup vertex attributes. */
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	/* Link vertex attributes */
 	/* Position attribute */
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	/* Texture coordinate attribute */
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	/* Unbind after VAO, otherwise VAO will remember and always unbind it */
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	/* load and create a texture*/
 	/* -------------------------------------------------------------------- */
@@ -163,8 +195,7 @@ int main()
 	{
 		/* render */
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		/* Bind textures */
 		glActiveTexture(GL_TEXTURE0);
@@ -179,10 +210,23 @@ int main()
 		glm_translate(transform, position);
 		// rotate
 		glm_rotate(transform, rotationRadians, GLM_ZUP);
-		glm_vec4_print(position, stdout);
 		// scale
 		glm_scale(transform, scale);
-		glm_mat4_print(transform, stdout);
+
+		/* Create model, view, and projection matrixes so opengl can
+		 * transform our local vectors to clip space. */
+		// Model matrix
+		mat4 modelMatrix;
+		glm_rotate_make(modelMatrix, glm_rad(-55.0f), GLM_XUP);
+		glm_rotate_at(modelMatrix, GLM_VEC3_ZERO, glm_rad(-55.0f) * glfwGetTime(), GLM_ZUP);
+		// View matrix
+		mat4 viewMatrix;
+		glm_mat4_identity(viewMatrix);
+		glm_translate_z(viewMatrix, -3.0f);
+		// Projection matrix
+		mat4 perspectiveMatrix;
+		glm_mat4_identity(perspectiveMatrix);
+		glm_perspective(glm_rad(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f, perspectiveMatrix);
 
 		/* Use shader */
 		useShader(defaultShader);
@@ -190,9 +234,13 @@ int main()
 		setShaderInt(defaultShader, "texture2", 1);
 		setShaderFloat(defaultShader, "smileyOpacity", 0.8f);
 		setShaderMat4(defaultShader, "transform", transform);
+		setShaderMat4(defaultShader, "modelMatrix", modelMatrix);
+		setShaderMat4(defaultShader, "viewMatrix", viewMatrix);
+		setShaderMat4(defaultShader, "perspectiveMatrix", perspectiveMatrix);
 
 		/* Use VAO to remember location of vertex attributes. */
 		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
@@ -204,7 +252,6 @@ int main()
 	/* De-allocate resources */
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ebo);
 
 	/* glfw: terminate, clears all allocated GLFW resources */
 	glfwTerminate();
@@ -213,6 +260,8 @@ int main()
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+	screenWidth = width;
+	screenHeight = height;
 	glViewport(0, 0, width, height);
 }
 

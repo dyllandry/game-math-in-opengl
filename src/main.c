@@ -15,24 +15,6 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void keyPressed(GLFWwindow* window, int key, int scancode, int action, int mods);
-void changeTextureMix(float delta);
-void increaseTextureMix();
-void decreaseTextureMix();
-void moveLeft();
-void moveRight();
-void moveUp();
-void moveDown();
-void scaleUp();
-void scaleDown();
-void rotateClockwise();
-void rotateCounterClockwise();
-
-struct Shader defaultShader;
-float textureMix = 0.2f;
-
-vec4 position = { 0.0f, 0.0f, 0.0f, 1.0f };
-vec3 scale = { 1.0f, 1.0f, 1.0f };
-float rotationRadians = 0.0f;
 
 int screenWidth;
 int screenHeight;
@@ -65,6 +47,7 @@ int main()
 
 	/* Create our shader */
 	/* -------------------------------------------------------------------- */
+	struct Shader defaultShader;
 	defaultShader = NewShader("src/vertex-shader.glsl", "src/fragment-shader.glsl");
 
 	/* Setup vertex data, buffers, and configure vertex attributes. */
@@ -206,52 +189,46 @@ int main()
 	/* -------------------------------------------------------------------- */
 	while (!glfwWindowShouldClose(window))
 	{
-		/* render */
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		// Clear the buffers used for color writing and depth
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// Set background color
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-		/* Bind textures */
+		/* Use shader */
+		useShader(defaultShader);
+
+		/* Bind texture */
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, faceTexture);
+		// Set texture to first (0) of opengl's texture units
+		setShaderInt(defaultShader, "texture0", 0);
+
+		// Set view & projection matrices
+		mat4 viewMatrix;
+		glm_mat4_identity(viewMatrix);
+		glm_translate_z(viewMatrix, -3.0f);
+		setShaderMat4(defaultShader, "viewMatrix", viewMatrix);
+		mat4 perspectiveMatrix;
+		glm_mat4_identity(perspectiveMatrix);
+		glm_perspective(glm_rad(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f, perspectiveMatrix);
+		setShaderMat4(defaultShader, "perspectiveMatrix", perspectiveMatrix);
+
+		/* Use VAO to remember vertice data & location of vertex
+		 * attributes (position & texture). */
+		glBindVertexArray(vao);
 
 		for (int i = 0; i < sizeof(cubePositions)/sizeof(cubePositions[0]); i++)
 		{
-			/* Create model, view, and projection matrixes so*/
-			/* opengl can transform our local vectors to clip*/
-			/* space.*/
-			// Model matrix
 			mat4 modelMatrix;
 			glm_translate_make(modelMatrix, cubePositions[i]);
 			glm_rotate(modelMatrix, glm_rad(-10.0f * glfwGetTime()), GLM_YUP);
 			glm_rotate(modelMatrix, glm_rad(10.0f * glfwGetTime()), GLM_XUP);
-			// View matrix
-			mat4 viewMatrix;
-			glm_mat4_identity(viewMatrix);
-			glm_translate_z(viewMatrix, -3.0f);
-			// Projection matrix
-			mat4 perspectiveMatrix;
-			glm_mat4_identity(perspectiveMatrix);
-			glm_perspective(glm_rad(45.0f), (float)screenWidth / screenHeight, 0.1f, 100.0f, perspectiveMatrix);
-
-			/* Use shader */
-			useShader(defaultShader);
-			/* Set textures */
-			setShaderInt(defaultShader, "texture1", 0);
-			setShaderInt(defaultShader, "texture2", 1);
-			setShaderFloat(defaultShader, "smileyOpacity", 0.8f);
-			/* Pass uniforms */
 			setShaderMat4(defaultShader, "modelMatrix", modelMatrix);
-			setShaderMat4(defaultShader, "viewMatrix", viewMatrix);
-			setShaderMat4(defaultShader, "perspectiveMatrix", perspectiveMatrix);
 
-			/* Use VAO to remember location of vertex attributes. */
-			glBindVertexArray(vao);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
 		}
+
+		glBindVertexArray(0);
 
 		/* glfw: swap the double render buffer & poll IO events */
 		glfwSwapBuffers(window);
@@ -277,77 +254,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void keyPressed(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (action != GLFW_PRESS) return;
-
-	if (key == GLFW_KEY_UP) increaseTextureMix();
-	else if (key == GLFW_KEY_DOWN) decreaseTextureMix();
-	else if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, 1);
-	else if (key == GLFW_KEY_A) moveLeft();
-	else if (key == GLFW_KEY_D) moveRight();
-	else if (key == GLFW_KEY_W) moveUp();
-	else if (key == GLFW_KEY_S) moveDown();
-	else if (key == GLFW_KEY_Q) rotateCounterClockwise();
-	else if (key == GLFW_KEY_E) rotateClockwise();
-	else if (key == GLFW_KEY_R) scaleUp();
-	else if (key == GLFW_KEY_F) scaleDown();
-}
-
-void moveLeft()
-{
-	position[0] -= 0.1f;
-}
-
-void moveRight()
-{
-	position[0] += 0.1f;
-}
-
-void moveUp()
-{
-	position[1] += 0.1f;
-}
-
-void moveDown()
-{
-	position[1] -= 0.1f;
-}
-
-void scaleUp()
-{
-	scale[0] += 0.1f;
-	scale[1] += 0.1f;
-}
-
-void scaleDown()
-{
-	scale[0] -= 0.1f;
-	scale[1] -= 0.1f;
-}
-
-void rotateClockwise()
-{
-	rotationRadians -= (2.0f * GLM_PI) / 18.0f;
-}
-
-void rotateCounterClockwise()
-{
-	rotationRadians += (2.0f * GLM_PI) / 18.0f;
-}
-
-void increaseTextureMix()
-{
-	changeTextureMix(0.2f);
-}
-
-void decreaseTextureMix()
-{
-	changeTextureMix(-0.2f);
-}
-
-void changeTextureMix(float delta)
-{
-	textureMix += delta;
-	if (textureMix > 1.0f) textureMix = 1;
-	else if (textureMix < 0.0f) textureMix = 0.0f;
-	setShaderFloat(defaultShader, "textureMix", textureMix);
+	if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, 1);
 }
 
